@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thought Board</title>
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <header class="d-flex justify-content-between px-5 py-3">
+      <h1 class="d-inline-block">
+        Hi {{ user.first_name }} {{ user.last_name }}!
+      </h1>
+      <a href="/auth/logout">
+        <h4>Logout</h4>
+      </a>
+    </header>
+    <section
+      class="row border-bottom border-2 border-dark col-6 mb-3 px-5 py-2"
+    >
+      <form action="/new-thought" class="" method="POST">
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-warning">{{ message.message }}</div>
+        {% endfor %} {% endif %} {% csrf_token %}
+        <div class="col-9 d-inline-block">
+          <input
+            type="text"
+            name="thought"
+            id="thought"
+            class="form-control"
+            placeholder="Post a Great Thought Here!"
+          />
+        </div>
+        <input
+          type="submit"
+          class="btn btn-primary align-top"
+          value="Add Thought!"
+        />
+      </form>
+    </section>
+    <section class="px-5">
+      {% for post in posts %}
+      <div class="col-6 mb-3">
+        <p class="d-inline-block mr-3 align-top me-5">
+          {{ post.created_by.first_name }} says:
+        </p>
+        <div class="d-inline-block col-8">
+          <div class="border border-3 rounded-3 ml-2" style="height: 5rem">
+            {{ post.message }}
+          </div>
+          <div
+            class="d-inline-block col-12 d-flex justify-content-between mt-1"
+          >
+            <a href="/thoughts/{{post.id}}">Details</a>
+            <span>{{post.liked_by.all|length}} Likes</span>
+            {% if post.created_by == user %}
+            <form action="/delete-thought" method="POST">
+              {%csrf_token%}
+              <input type="hidden" name="post_id" value="{{post.id}}" />
+              <input
+                type="submit"
+                value="Delete"
+                class="btn btn-outline-danger"
+              />
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+  </body>
+</html>
